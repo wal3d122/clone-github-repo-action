@@ -1,14 +1,10 @@
-name: 'Clone Github Repo Action'
-
-description: "Github Action to clone a public or private Github repository and access its content on others repositories' workflows."
+name: 'Clone Repositories'
+description: 'Github Action to clone a public or private Github repository and access its content on others repositories workflows.'
 
 inputs:
   owner:
     description: 'Repository Owner'
     required: true
-  # repository:
-  #   description: 'Repository name'
-  #   required: true
   repositories:
     description: 'Comma-separated list of repository names'
     required: true
@@ -42,35 +38,10 @@ runs:
               https://api.github.com/user/repos
           fi
       
-          if [ -z "${{ inputs.access-token }}" ]; then
-            if [ -z "${{ inputs.depth }}" ]; then
-              if [ "${{ inputs.submodule }}" = "true" ]; then
-                git clone --branch "${{ inputs.branch }}" https://github.com/${{ inputs.owner }}/$REPO.git  --recursive
-              else
-                git clone --branch "${{ inputs.branch }}" https://github.com/${{ inputs.owner }}/$REPO.git
-              fi
-            else
-              if [ "${{ inputs.submodule }}" = "true" ]; then
-                git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://github.com/${{ inputs.owner }}/$REPO.git  --recursive
-              else
-                git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://github.com/${{ inputs.owner }}/$REPO.git
-              fi
-            fi
-          else
-            if [ -z "${{ inputs.depth }}" ]; then
-              if [ "${{ inputs.submodule }}" = "true" ]; then
-                git clone --branch "${{ inputs.branch }}" https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/$REPO.git  --recursive
-              else
-                git clone --branch "${{ inputs.branch }}" https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/$REPO.git
-              fi
-            else
-              if [ "${{ inputs.submodule }}" = "true" ]; then
-                git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/$REPO.git  --recursive
-              else
-                git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/$REPO.git
-              fi
-            fi
-          fi
+          git clone https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/$REPO.git
+          cd $REPO
+          git checkout "${{ inputs.branch }}" 2>/dev/null || git checkout -b "${{ inputs.branch }}"
+          cd ..
       
           if [ -d "$REPO" ]; then
             echo "Cloned $REPO repository successfully."
@@ -85,4 +56,3 @@ runs:
 branding:
   icon: 'download'
   color: 'blue'
-
