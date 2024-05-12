@@ -5,6 +5,9 @@ inputs:
   owner:
     description: "Repository Owner"
     required: true
+  root-repo:
+    description: "Root repository name"
+    required: true
   repositories:
     description: "Comma-separated list of repository names"
     required: true
@@ -47,7 +50,7 @@ runs:
           cd $REPO
           git checkout "${{ inputs.branch }}" 2>/dev/null || git checkout -b "${{ inputs.branch }}"
           rm -rf *
-          cp -r ../root-repo/* .
+          cp -r ../${{ inputs.root-repo }}/* .
           git add .
           git commit -m "Sync with root repository"
           git push origin "${{ inputs.branch }}"
