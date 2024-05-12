@@ -32,8 +32,8 @@ runs:
   steps:
     - name: Clone root repository
       run: |
-        git clone https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.root-repo }}.git 'root-repo'
-        cd root-repo
+        git clone https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.root-repo }}.git
+        cd ${{ inputs.root-repo }}
         ls -la
       shell: bash
 
