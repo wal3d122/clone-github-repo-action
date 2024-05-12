@@ -5,6 +5,12 @@ inputs:
   owner:
     description: "Repository Owner"
     required: true
+  username:
+    description: "Github username"
+    required: true
+  useremail:
+    description: "Github user email"
+    required: true
   root-repo:
     description: "Root repository name"
     required: true
@@ -30,6 +36,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+  - name: Set Git user
+      run: |
+        git config --global user.email ${{ inputs.useremail }}
+        git config --global user.name ${{ inputs.username }}
+      shell: bash
+
     - name: Clone root repository
       run: |
         git clone https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.root-repo }}.git
