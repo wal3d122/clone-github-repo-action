@@ -1,33 +1,38 @@
-name: 'Clone Repositories'
-description: 'Github Action to clone a public or private Github repository and access its content on others repositories workflows.'
+name: "Clone Repositories"
+description: "Github Action to clone a public or private Github repository and access its content on others repositories workflows."
 
 inputs:
   owner:
-    description: 'Repository Owner'
+    description: "Repository Owner"
     required: true
   repositories:
-    description: 'Comma-separated list of repository names'
+    description: "Comma-separated list of repository names"
     required: true
   access-token:
-    description: 'PAT with repository scope (https://github.com/settings/tokens)'
+    description: "PAT with repository scope (https://github.com/settings/tokens)"
     required: false
   depth:
-    description: 'Depth of the clone (default: full history)'
+    description: "Depth of the clone (default: full history)"
     required: false
     default: ""
   branch:
-    description: 'Branch name (default: main)'
+    description: "Branch name (default: main)"
     required: false
-    default: "main" 
+    default: "main"
   submodule:
-    description: 'Clone with submodules'
+    description: "Clone with submodules"
     required: false
-    default: "false" 
+    default: "false"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
-    - name: Clone repository
+    - name: Clone root repository
+      run: |
+        git clone https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.root-repo }}.git root-repo
+      shell: bash
+
+    - name: Clone or create and sync repositories
       run: |
         IFS=',' read -ra REPO_ARRAY <<< "${{ inputs.repositories }}"
         for REPO in "${REPO_ARRAY[@]}"; do
@@ -37,22 +42,23 @@ runs:
               -d "{\"name\":\"$REPO\", \"private\": true}" \
               https://api.github.com/user/repos
           fi
-      
+
           git clone https://${{ inputs.access-token }}@github.com/${{ inputs.owner }}/$REPO.git
           cd $REPO
           git checkout "${{ inputs.branch }}" 2>/dev/null || git checkout -b "${{ inputs.branch }}"
+          rm -rf *
+          cp -r ../root-repo/* .
+          git add .
+          git commit -m "Sync with root repository"
+          git push origin "${{ inputs.branch }}"
           cd ..
-      
+
           if [ -d "$REPO" ]; then
-            echo "Cloned $REPO repository successfully."
+            echo "Cloned and synced $REPO repository successfully."
             echo "Access the repository content using \"cd $REPO.\""
           else
-            echo "Error: Couldn't clone $REPO repository. Check the inputs or the PAT scope."
+            echo "Error: Couldn't clone or sync $REPO repository. Check the inputs or the PAT scope."
             exit 1
           fi
         done
       shell: bash
-
-branding:
-  icon: 'download'
-  color: 'blue'
