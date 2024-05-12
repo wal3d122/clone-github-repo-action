@@ -33,7 +33,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Set Git user
+    - name: Set Git user
       run: |
         git config --global user.email ${{ inputs.useremail }}
         git config --global user.name ${{ inputs.owner }}
