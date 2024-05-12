@@ -5,9 +5,6 @@ inputs:
   owner:
     description: "Repository Owner"
     required: true
-  username:
-    description: "Github username"
-    required: true
   useremail:
     description: "Github user email"
     required: true
@@ -39,7 +36,7 @@ runs:
   - name: Set Git user
       run: |
         git config --global user.email ${{ inputs.useremail }}
-        git config --global user.name ${{ inputs.username }}
+        git config --global user.name ${{ inputs.owner }}
       shell: bash
 
     - name: Clone root repository
